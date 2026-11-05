@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: verdict-worker
+  namespace: verdict
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: verdict-worker
+  template:
+    metadata:
+      labels:
+        app: verdict-worker
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9100"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: worker
+          image: us-central1-docker.pkg.dev/verdict-ai-prod/verdict/verdict-worker:latest
+          ports:
+            - containerPort: 9100
+              name: metrics
+          envFrom:
+            - configMapRef:
+                name: verdict-config
+            - secretRef:
+                name: verdict-secrets
+          volumeMounts:
+            - name: documents
+              mountPath: /data/documents
+            - name: rag
+              mountPath: /data/rag
+          # No liveness probe — the worker is a polling loop, not an HTTP server.
+          # Restart policy handles crashes automatically.
+          resources:
+            requests:
+              cpu: 250m
+              memory: 1Gi
+            limits:
+              cpu: "2"
+              memory: 4Gi
+      volumes:
+        - name: documents
+          persistentVolumeClaim:
+            claimName: verdict-documents
+        - name: rag
+          persistentVolumeClaim:
+            claimName: verdict-rag

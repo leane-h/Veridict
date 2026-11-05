@@ -1,0 +1,113 @@
+@import "tailwindcss";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+@import "@fontsource/playfair-display/700.css";
+@import "@fontsource/playfair-display/800.css";
+
+@theme {
+  --color-background: #FAFAF7;
+  --color-surface: #FFFFFF;
+  --color-accent: #C8973E;
+  --color-accent-hover: #B5862F;
+  --color-text-primary: #1A1A1A;
+  --color-text-secondary: #6B6560;
+  --color-border: #E8E4DF;
+  --color-risk-high: #C4432B;
+  --color-risk-medium: #C8973E;
+  --color-risk-low: #3D8B5E;
+  --color-drop-zone: #F5F3EE;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  margin: 0;
+  min-height: 100vh;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.dark {
+  --color-background: #1A1815;
+  --color-surface: #252220;
+  --color-accent: #C8973E;
+  --color-accent-hover: #D9A84F;
+  --color-text-primary: #F5F3EE;
+  --color-text-secondary: #9A9490;
+  --color-border: #3A3632;
+  --color-risk-high: #E05A43;
+  --color-risk-medium: #D9A84F;
+  --color-risk-low: #4EA872;
+  --color-drop-zone: #1F1C19;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #F8F6F1;
+  --surface: #FFFFFF;
+  --hover-bg: #F2EFE9;
+  --accent: #C8973E;
+  --accent-hover: #B5862F;
+  --text: #1C1917;
+  --text-2: #78716C;
+  --text-3: #A8A29E;
+  --border: #E7E3DC;
+  --border-light: #F0EDE8;
+  --risk-high: #C4432B;
+  --risk-medium: #C8973E;
+  --risk-low: #3D8B5E;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+  --h-font: var(--font-serif);
+  --density-pad: 60px;
+  --density-gap: 48px;
+}
+
+.dark {
+  --bg: #1A1815;
+  --surface: #242220;
+  --hover-bg: #2A2825;
+  --accent: #C8973E;
+  --accent-hover: #D9A84F;
+  --text: #F5F3EE;
+  --text-2: #9A9490;
+  --text-3: #6B6560;
+  --border: #38342F;
+  --border-light: #2E2B27;
+  --risk-high: #E05A43;
+  --risk-medium: #D9A84F;
+  --risk-low: #4EA872;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+@keyframes slideWidth {
+  from { width: 0; }
+}
+
+.pulse {
+  animation: pulse 1.8s ease-in-out infinite;
+}
+
+button {
+  font: inherit;
+}

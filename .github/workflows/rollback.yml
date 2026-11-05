@@ -1,0 +1,70 @@
+name: Emergency Rollback
+
+# Manual trigger — use this when a bad deploy slips through the smoke test
+# or when you need to roll back a specific layer independently.
+#
+# Secrets required (only for scopes that need them):
+#   GCP_WORKLOAD_IDENTITY_PROVIDER — OIDC provider for GCP auth
+#   GCP_SERVICE_ACCOUNT           — SA email for GCP auth
+#   MLFLOW_TRACKING_URI           — MLflow model rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: "Layer(s) to roll back (space-separated: api worker frontend vllm mlflow all)"
+        required: true
+        default: "all"
+      model_name:
+        description: "MLflow model name (only used if scope includes mlflow)"
+        required: false
+        default: "kira"
+      dry_run:
+        description: "Dry run — print plan only, no changes"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  GKE_CLUSTER_NAME: ${{ vars.GKE_CLUSTER_NAME }}
+  GKE_REGION: ${{ vars.GKE_REGION }}
+  GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install mlflow pyyaml
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER_NAME }}
+          location: ${{ env.GKE_REGION }}
+          project_id: ${{ env.GCP_PROJECT_ID }}
+
+      - name: Run rollback
+        run: |
+          ARGS="--scope ${{ inputs.scope }} --model ${{ inputs.model_name }}"
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          python scripts/rollback.py $ARGS
+        env:
+          MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
